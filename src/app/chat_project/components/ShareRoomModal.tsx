@@ -71,10 +71,17 @@ export default function ShareRoomModal({ isOpen, onClose, roomId, isEncrypted }:
     }
   };
 
+  // 检查是否支持 Web Share API
+  const isWebShareSupported = () => {
+    return typeof navigator !== 'undefined' &&
+           'share' in navigator &&
+           typeof navigator.share === 'function';
+  };
+
   // 使用Web Share API分享
   const handleNativeShare = async () => {
     try {
-      if (navigator.share) {
+      if (isWebShareSupported()) {
         await navigator.share({
           title: '聊天房间分享',
           text: shareText,
@@ -215,7 +222,7 @@ export default function ShareRoomModal({ isOpen, onClose, roomId, isEncrypted }:
                   >
                     复制链接
                   </motion.button>
-                  {navigator.share && (
+                  {isWebShareSupported() && (
                     <motion.button
                       onClick={handleNativeShare}
                       whileHover={{ scale: 1.02 }}
