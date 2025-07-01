@@ -2,10 +2,12 @@
 
 import { motion } from 'framer-motion';
 import { useRef, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faUsers, faGamepad, faExclamationTriangle, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUsers, faGamepad, faExclamationTriangle, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { WebRTCManager, GameMove, GameState, ConnectionInfo, PlayerReadyState, GameAssignment } from './lib/webrtc-manager';
 import { checkCryptoSupport, generateCryptoReport } from './lib/crypto-compatibility';
+import ShareRoomModal from './components/ShareRoomModal';
 
 // 前置页面组件
 interface LobbyPageProps {
@@ -13,6 +15,7 @@ interface LobbyPageProps {
 }
 
 const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
+  const router = useRouter();
   const [webrtcManager] = useState(() => new WebRTCManager());
   const [roomIdInput, setRoomIdInput] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
@@ -125,7 +128,7 @@ const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
   };
   return (
     <motion.div
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative"
       style={{
         background: 'linear-gradient(135deg, #F8F6F0 0%, #F0EBDC 50%, #E8E0D0 100%)'
       }}
@@ -133,6 +136,19 @@ const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
+      {/* 返回按钮 - 左上角固定定位 */}
+      <div className="absolute top-4 left-4 z-10">
+        <motion.button
+          onClick={() => router.push('/')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-10 h-10 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+          title="返回 Game Hub"
+        >
+          <FontAwesomeIcon icon={faHome} className="w-5 h-5" />
+        </motion.button>
+      </div>
+
       <motion.div
         className="w-full max-w-md sm:max-w-lg lg:max-w-lg xl:max-w-xl p-6 sm:p-8 lg:p-12 rounded-2xl shadow-2xl text-center"
         style={{ backgroundColor: '#D4B896' }}
@@ -366,6 +382,8 @@ const GomokuBoard = ({ onBackToLobby, webrtcManager, connectionInfo }: GomokuBoa
 
   // 复制链接状态
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
+  // 分享模态框状态
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
 
   // 组件初始化时重置游戏状态
   useEffect(() => {
@@ -538,39 +556,14 @@ const GomokuBoard = ({ onBackToLobby, webrtcManager, connectionInfo }: GomokuBoa
     }
   };
 
-  // 复制房间链接
-  const handleCopyRoomLink = async () => {
-    try {
-      const currentUrl = window.location.origin + window.location.pathname;
-      const roomLink = `${currentUrl}?room=${connectionInfo.roomId}`;
+  // 分享房间功能
+  const handleShareRoom = () => {
+    setShowShareModal(true);
+  };
 
-      await navigator.clipboard.writeText(roomLink);
-      setCopySuccess(true);
-
-      // 2秒后重置复制状态
-      setTimeout(() => {
-        setCopySuccess(false);
-      }, 2000);
-    } catch (error) {
-      console.error('复制失败:', error);
-      // 降级方案：使用传统的复制方法
-      try {
-        const textArea = document.createElement('textarea');
-        const currentUrl = window.location.origin + window.location.pathname;
-        const roomLink = `${currentUrl}?room=${connectionInfo.roomId}`;
-        textArea.value = roomLink;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        setCopySuccess(true);
-        setTimeout(() => {
-          setCopySuccess(false);
-        }, 2000);
-      } catch (fallbackError) {
-        console.error('降级复制也失败:', fallbackError);
-      }
-    }
+  // 关闭分享模态框
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
   };
 
   // 设置WebRTC回调
@@ -1408,7 +1401,7 @@ const GomokuBoard = ({ onBackToLobby, webrtcManager, connectionInfo }: GomokuBoa
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-xs sm:text-lg" />
+            <FontAwesomeIcon icon={faHome} className="text-xs sm:text-lg" />
           </motion.button>
         )}
 
@@ -1743,23 +1736,16 @@ const GomokuBoard = ({ onBackToLobby, webrtcManager, connectionInfo }: GomokuBoa
               房间号: <span className="font-mono font-semibold text-gray-800">{connectionInfo.roomId}</span>
             </p>
 
-            {/* 房主显示复制按钮 */}
+            {/* 房主显示分享按钮 */}
             {connectionInfo.playerRole === 'host' && (
               <motion.button
-                onClick={handleCopyRoomLink}
-                className={`flex items-center justify-center w-6 h-6 rounded transition-all duration-200 ${
-                  copySuccess
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800'
-                }`}
-                title={copySuccess ? "链接已复制!" : "复制房间链接"}
-                whileTap={{ scale: 0.9 }}
-                whileHover={{ scale: 1.1 }}
+                onClick={handleShareRoom}
+                className="flex items-center justify-center px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-xs rounded-full transition-all duration-200 shadow-lg"
+                title="分享房间"
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }}
               >
-                <FontAwesomeIcon
-                  icon={copySuccess ? faCheck : faCopy}
-                  className="text-xs"
-                />
+                🔗 分享
               </motion.button>
             )}
           </div>
@@ -1768,11 +1754,19 @@ const GomokuBoard = ({ onBackToLobby, webrtcManager, connectionInfo }: GomokuBoa
         </motion.div>
       </motion.div>
       )}
+
+      {/* 分享房间模态框 */}
+      <ShareRoomModal
+        isOpen={showShareModal}
+        onClose={handleCloseShareModal}
+        roomId={connectionInfo.roomId}
+      />
     </motion.div>
   );
 };
 
 export default function Home() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState<'lobby' | 'game'>('lobby');
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);

@@ -2,8 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import CloseIcon from '@mui/icons-material/Close';
 import ShareIcon from '@mui/icons-material/Share';
+import HomeIcon from '@mui/icons-material/Home';
 import WelcomeScreen from './WelcomeScreen';
 import JoinRoomModal from './JoinRoomModal';
 import CreateRoomModal from './CreateRoomModal';
@@ -21,6 +23,8 @@ type ViewType = 'welcome' | 'chat';
 type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
 
 export default function ChatContainer() {
+  const router = useRouter();
+
   // 界面状态管理
   const [currentView, setCurrentView] = useState<ViewType>('welcome');
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -304,10 +308,25 @@ export default function ChatContainer() {
   if (currentView === 'welcome') {
     return (
       <>
-        <WelcomeScreen
-          onCreateRoom={handleCreateRoom}
-          onJoinRoom={handleShowJoinRoom}
-        />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 relative">
+          {/* 返回按钮 - 左上角固定定位 */}
+          <div className="absolute top-4 left-4 z-10">
+            <motion.button
+              onClick={() => router.push('/')}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="w-10 h-10 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+              title="返回 Game Hub"
+            >
+              <HomeIcon className="w-5 h-5" />
+            </motion.button>
+          </div>
+
+          <WelcomeScreen
+            onCreateRoom={handleCreateRoom}
+            onJoinRoom={handleShowJoinRoom}
+          />
+        </div>
         <JoinRoomModal
           isOpen={showJoinModal}
           onClose={handleCloseJoinModal}
@@ -344,6 +363,19 @@ export default function ChatContainer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 relative">
+      {/* 返回按钮 - 左上角固定定位 */}
+      <div className="absolute top-4 left-4 z-10">
+        <motion.button
+          onClick={() => router.push('/')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-10 h-10 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+          title="返回 Game Hub"
+        >
+          <HomeIcon className="w-5 h-5" />
+        </motion.button>
+      </div>
+
       {/* 主题切换按钮 - 右上角固定定位 */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle size="medium" />

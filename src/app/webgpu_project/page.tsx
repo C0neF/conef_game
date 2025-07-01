@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUsers, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import DiceCanvas, { DiceCanvasHandle } from './components/DiceCanvas';
 import Scoreboard from './components/Scoreboard';
 import ThemeToggle from './components/ThemeToggle';
+import ShareRoomModal from './components/ShareRoomModal';
 import { WebRTCManager, ConnectionInfo } from './lib/webrtc-manager';
 
 // 扩展Navigator接口以支持WebGPU
@@ -81,6 +83,7 @@ function GameUI({ onBackToLobby, roomId, webrtcManager, connectionInfo }: GameUI
   const opponentSelectedDiceRef = useRef<boolean[]>([false, false, false, false, false]);
   const [opponentCurrentFaces, setOpponentCurrentFaces] = useState<number[]>([1, 1, 1, 1, 1]);
   const [opponentRollsLeft, setOpponentRollsLeft] = useState<number>(3);
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -699,24 +702,14 @@ function GameUI({ onBackToLobby, roomId, webrtcManager, connectionInfo }: GameUI
     });
   };
 
-  // 复制房间号到剪贴板
-  const copyRoomId = async () => {
-    if (roomId) {
-      try {
-        await navigator.clipboard.writeText(roomId);
-        alert('房间号已复制到剪贴板！');
-      } catch (err) {
-        console.error('复制失败:', err);
-        // 降级方案：选择文本
-        const textArea = document.createElement('textarea');
-        textArea.value = roomId;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert('房间号已复制到剪贴板！');
-      }
-    }
+  // 分享房间功能
+  const handleShareRoom = () => {
+    setShowShareModal(true);
+  };
+
+  // 关闭分享模态框
+  const handleCloseShareModal = () => {
+    setShowShareModal(false);
   };
 
   return (
@@ -863,13 +856,15 @@ function GameUI({ onBackToLobby, roomId, webrtcManager, connectionInfo }: GameUI
               )}
               <span className="text-gray-600 dark:text-gray-300">房间:</span>
               <span className="font-mono font-bold text-gray-800 dark:text-white">{roomId}</span>
-              <button
-                onClick={copyRoomId}
-                className="px-2 py-0.5 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors duration-200"
-                title="复制房间号"
+              <motion.button
+                onClick={handleShareRoom}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-3 py-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-xs rounded-full transition-all duration-200 shadow-lg"
+                title="分享房间"
               >
-                📋
-              </button>
+                🔗 分享
+              </motion.button>
             </div>
 
             {/* 游戏准备状态 */}
@@ -911,7 +906,12 @@ function GameUI({ onBackToLobby, roomId, webrtcManager, connectionInfo }: GameUI
         </div>
       )}
 
-
+      {/* 分享房间模态框 */}
+      <ShareRoomModal
+        isOpen={showShareModal}
+        onClose={handleCloseShareModal}
+        roomId={roomId || ''}
+      />
     </div>
   );
 }
@@ -922,6 +922,7 @@ interface LobbyPageProps {
 }
 
 const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
+  const router = useRouter();
   const [isConnecting, setIsConnecting] = useState(false);
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [roomIdInput, setRoomIdInput] = useState('');
@@ -1016,6 +1017,21 @@ const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
+      {/* 返回按钮 - 左上角固定定位 */}
+      <div className="absolute top-4 left-4 z-10">
+        <motion.button
+          onClick={() => router.push('/')}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="w-10 h-10 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full shadow-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+          title="返回 Game Hub"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </motion.button>
+      </div>
+
       {/* 右上角深色模式切换按钮 */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
@@ -1166,6 +1182,7 @@ const LobbyPage = ({ onEnterGame }: LobbyPageProps) => {
 };
 
 export default function Home() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState<'lobby' | 'game'>('lobby');
   const [roomId, setRoomId] = useState<string>('');
   const [webrtcManager, setWebrtcManager] = useState<WebRTCManager | null>(null);

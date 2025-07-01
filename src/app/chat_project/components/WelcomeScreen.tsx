@@ -13,7 +13,7 @@ interface WelcomeScreenProps {
 
 export default function WelcomeScreen({ onCreateRoom, onJoinRoom }: WelcomeScreenProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4 relative">
+    <div className="min-h-screen flex items-center justify-center p-4 relative">
       {/* 主题切换按钮 - 右上角固定定位 */}
       <div className="absolute top-4 right-4 z-10">
         <ThemeToggle size="medium" />
