@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Tailwind CSS v4 深色模式配置 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}

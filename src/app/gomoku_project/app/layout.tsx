@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "./chat_project/app/globals.css";
-import "./gomoku_project/app/globals.css";
-import "./webgpu_project/app/globals.css";
-import { ThemeProvider } from "./chat_project/contexts/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +13,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Game Hub - Conef Game",
-  description: "A modern web application hub for Chat Room, Gomoku Game, and WebGPU Demo",
+  title: "五子棋在线对战游戏",
+  description: "基于 Next.js 和 WebRTC 技术的实时五子棋对战游戏，支持移动端和桌面端",
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -31,9 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider defaultTheme="system" storageKey="game-hub-theme">
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

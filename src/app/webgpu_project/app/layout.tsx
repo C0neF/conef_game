@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import "./chat_project/app/globals.css";
-import "./gomoku_project/app/globals.css";
-import "./webgpu_project/app/globals.css";
-import { ThemeProvider } from "./chat_project/contexts/ThemeContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Game Hub - Conef Game",
-  description: "A modern web application hub for Chat Room, Gomoku Game, and WebGPU Demo",
+  title: "快艇骰子游戏",
+  description: "使用 WebGPU 和 Three.js 开发的快艇骰子游戏",
 };
 
 export default function RootLayout({
@@ -27,11 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning={true}
       >
-        <ThemeProvider defaultTheme="system" storageKey="game-hub-theme">
+        <ThemeProvider>
           {children}
         </ThemeProvider>
       </body>
