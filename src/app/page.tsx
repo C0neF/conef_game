@@ -34,11 +34,13 @@ export default function Home() {
       case 1:
         return moduleIndex === 1 ? 3 : 1;
       case 2:
-        return moduleIndex === 2 ? 4 : 1;
+        return moduleIndex === 2 ? 3 : 1;
       case 3:
         return moduleIndex === 3 ? 3 : 1;
+      case 4:
+        return moduleIndex === 4 ? 3 : 1;
       default:
-        return moduleIndex === 2 ? 2 : 1;
+        return 1; // 默认所有模块相等
     }
   };
 
@@ -52,6 +54,9 @@ export default function Home() {
         router.push('/chat_project');
         break;
       case 3:
+        router.push('/turtle_soup_project');
+        break;
+      case 4:
         router.push('/webgpu_project');
         break;
     }
@@ -85,7 +90,7 @@ export default function Home() {
           <motion.div
             className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl"
             style={{
-              height: isMobile ? 'calc((100vh - 8rem) / 3)' : '66.67vh',
+              height: isMobile ? 'calc((100vh - 8rem) / 4)' : '66.67vh',
               minWidth: '200px'
             }}
             initial={{
@@ -97,7 +102,7 @@ export default function Home() {
               x: 0,
               opacity: 1,
               flex: getModuleFlex(1),
-              scale: hoveredModule === 1 ? 1.02 : 1,
+              scale: 1,
               borderColor: hoveredModule === 1 ? '#3B82F6' : 'rgb(229 231 235)'
             }}
             transition={{
@@ -126,7 +131,7 @@ export default function Home() {
           <motion.div
             className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl"
             style={{
-              height: isMobile ? 'calc((100vh - 8rem) / 3)' : '66.67vh',
+              height: isMobile ? 'calc((100vh - 8rem) / 4)' : '66.67vh',
               minWidth: '200px'
             }}
             initial={{
@@ -135,7 +140,7 @@ export default function Home() {
               flex: getModuleFlex(2)
             }}
             animate={{
-              scale: hoveredModule === 2 ? 1.02 : 1,
+              scale: 1,
               opacity: 1,
               flex: getModuleFlex(2),
               borderColor: hoveredModule === 2 ? '#10B981' : 'rgb(229 231 235)'
@@ -161,28 +166,28 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Module 3 - WebGPU */}
+          {/* Module 3 - Turtle Soup */}
           <motion.div
             className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl"
             style={{
-              height: isMobile ? 'calc((100vh - 8rem) / 3)' : '66.67vh',
+              height: isMobile ? 'calc((100vh - 8rem) / 4)' : '66.67vh',
               minWidth: '200px'
             }}
             initial={{
-              x: 300,
+              y: 300,
               opacity: 0,
               flex: getModuleFlex(3)
             }}
             animate={{
-              x: 0,
+              y: 0,
               opacity: 1,
               flex: getModuleFlex(3),
-              scale: hoveredModule === 3 ? 1.02 : 1,
+              scale: 1,
               borderColor: hoveredModule === 3 ? '#8B5CF6' : 'rgb(229 231 235)'
             }}
             transition={{
-              x: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: "spring", stiffness: 100, damping: 20, delay: 0.6 },
-              opacity: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.6 },
+              y: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: "spring", stiffness: 100, damping: 20, delay: 0.5 },
+              opacity: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.5 },
               flex: { duration: 0.3, ease: "easeOut" },
               scale: { duration: 0.2, ease: "easeOut" },
               borderColor: { duration: 0.2, ease: "easeOut" }
@@ -191,6 +196,47 @@ export default function Home() {
             onMouseEnter={() => setHoveredModule(3)}
             onMouseLeave={() => setHoveredModule(null)}
             onClick={() => handleModuleClick(3)}
+            whileHover={{
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
+            }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="text-6xl mb-4">🐢</div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">海龟汤</h3>
+            </div>
+          </motion.div>
+
+          {/* Module 4 - WebGPU */}
+          <motion.div
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center cursor-pointer hover:shadow-2xl"
+            style={{
+              height: isMobile ? 'calc((100vh - 8rem) / 4)' : '66.67vh',
+              minWidth: '200px'
+            }}
+            initial={{
+              x: 300,
+              opacity: 0,
+              flex: getModuleFlex(4)
+            }}
+            animate={{
+              x: 0,
+              opacity: 1,
+              flex: getModuleFlex(4),
+              scale: 1,
+              borderColor: hoveredModule === 4 ? '#F59E0B' : 'rgb(229 231 235)'
+            }}
+            transition={{
+              x: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], type: "spring", stiffness: 100, damping: 20, delay: 0.7 },
+              opacity: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.7 },
+              flex: { duration: 0.3, ease: "easeOut" },
+              scale: { duration: 0.2, ease: "easeOut" },
+              borderColor: { duration: 0.2, ease: "easeOut" }
+            }}
+            layout
+            onMouseEnter={() => setHoveredModule(4)}
+            onMouseLeave={() => setHoveredModule(null)}
+            onClick={() => handleModuleClick(4)}
             whileHover={{
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)"
             }}

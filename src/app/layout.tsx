@@ -4,6 +4,7 @@ import "./globals.css";
 import "./chat_project/app/globals.css";
 import "./gomoku_project/app/globals.css";
 import "./webgpu_project/app/globals.css";
+import "./turtle_soup_project/app/globals.css";
 import { ThemeProvider } from "./chat_project/contexts/ThemeContext";
 
 const geistSans = Geist({
